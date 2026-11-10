@@ -131,3 +131,24 @@ class Paddle(GameObject):
         self.width = new_width
 
 
+class Brick(GameObject):
+    COLORS = {1: '#ef5350', 2: '#42a5f5', 3: '#ab47bc'}
+    OUTLINES = {1: '#ff8a80', 2: '#90caf9', 3: '#ce93d8'}
+    POINTS = {1: 5, 2: 10, 3: 15}
+
+    def __init__(self, canvas, x, y, width, height, hits):
+        self.hits = hits
+        item = canvas.create_rectangle(x, y, x + width, y + height,
+                                       fill=Brick.COLORS[hits],
+                                       outline=Brick.OUTLINES[hits])
+        super().__init__(canvas, item)
+
+    def hit(self):
+        """Kurangi nyawa balok. Return True kalau balok hancur."""
+        self.hits -= 1
+        if self.hits <= 0:
+            self.delete()
+            return True
+        self.canvas.itemconfig(self.item, fill=Brick.COLORS[self.hits],
+                               outline=Brick.OUTLINES[self.hits])
+        return False
