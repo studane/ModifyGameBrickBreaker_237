@@ -103,3 +103,31 @@ class Ball(GameObject):
             self.dy = -self.dy
 
 
+class Paddle(GameObject):
+    def __init__(self, canvas, x, y):
+        self.width = PADDLE_WIDTH
+        self.height = 12
+        self.speed = 9
+        item = canvas.create_rectangle(x - self.width / 2, y - self.height / 2,
+                                       x + self.width / 2, y + self.height / 2,
+                                       fill='#ffd54f', outline='#fff59d', width=2)
+        super().__init__(canvas, item)
+
+    def move_by(self, offset):
+        x1, _, x2, _ = self.get_position()
+        offset = max(-x1, min(WIDTH - x2, offset))
+        self.move(offset, 0)
+
+    def move_to(self, x):
+        x1, _, x2, _ = self.get_position()
+        self.move_by(x - (x1 + x2) / 2)
+
+    def set_width(self, new_width):
+        """Ubah lebar paddle dengan titik tengah tetap, tetap di dalam layar."""
+        x1, y1, x2, y2 = self.get_position()
+        new_x1 = (x1 + x2) / 2 - new_width / 2
+        new_x1 = max(0, min(WIDTH - new_width, new_x1))
+        self.canvas.coords(self.item, new_x1, y1, new_x1 + new_width, y2)
+        self.width = new_width
+
+
