@@ -152,3 +152,31 @@ class Brick(GameObject):
         self.canvas.itemconfig(self.item, fill=Brick.COLORS[self.hits],
                                outline=Brick.OUTLINES[self.hits])
         return False
+
+
+class PowerUp(GameObject):
+    """Kapsul yang jatuh. Jenis:
+    - 'multi': hijau '+'  -> setiap bola berlipat ganda
+    - 'wide' : oranye '<>' -> paddle jadi lebih panjang (sementara)"""
+    FALL_SPEED = 3
+    STYLE = {'multi': ('#66bb6a', '+'), 'wide': ('#ff9800', '<>')}
+
+    def __init__(self, canvas, x, y, kind):
+        self.kind = kind
+        color, text = PowerUp.STYLE[kind]
+        item = canvas.create_oval(x - 16, y - 10, x + 16, y + 10,
+                                  fill=color, outline='#ffffff', width=2)
+        self.label = canvas.create_text(x, y, text=text, fill='white',
+                                        font=('Arial', 11, 'bold'))
+        super().__init__(canvas, item)
+
+    def move(self, x, y):
+        super().move(x, y)
+        self.canvas.move(self.label, x, y)
+
+    def delete(self):
+        super().delete()
+        self.canvas.delete(self.label)
+
+    def update(self):
+        self.move(0, PowerUp.FALL_SPEED)
