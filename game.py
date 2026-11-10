@@ -39,3 +39,67 @@ class GameObject:
     def delete(self):
         self.canvas.delete(self.item)
 
+
+class Ball(GameObject):
+    def __init__(self, canvas, x, y, speed):
+        self.radius = 7
+        self.speed = speed
+        self.dx = 0.0
+        self.dy = 0.0
+        item = canvas.create_oval(x - self.radius, y - self.radius,
+                                  x + self.radius, y + self.radius,
+                                  fill='#ffffff', outline='#00e5ff', width=2)
+        super().__init__(canvas, item)
+
+    def launch(self):
+        angle = math.radians(random.uniform(-35, 35))
+        self.set_angle(angle)
+
+    def set_speed(self, speed):
+        """Ubah kecepatan tanpa mengubah arah."""
+        if self.speed and (self.dx or self.dy):
+            k = speed / self.speed
+            self.dx *= k
+            self.dy *= k
+        self.speed = speed
+
+    def set_angle(self, angle):
+        """Angle dalam radian, 0 = lurus ke atas."""
+        self.dx = self.speed * math.sin(angle)
+        self.dy = -self.speed * math.cos(angle)
+
+    def current_angle(self):
+        return math.atan2(self.dx, -self.dy)
+
+    def center(self):
+        x1, y1, x2, y2 = self.get_position()
+        return (x1 + x2) / 2, (y1 + y2) / 2
+
+    def update(self):
+        x1, y1, x2, y2 = self.get_position()
+        if (x1 <= 0 and self.dx < 0) or (x2 >= WIDTH and self.dx > 0):
+            self.dx = -self.dx
+        if y1 <= TOP and self.dy < 0:
+            self.dy = -self.dy
+        self.move(self.dx, self.dy)
+
+    def bounce_paddle(self, paddle):
+        # Sudut pantulan tergantung di bagian paddle mana bola mengenai
+        px1, _, px2, _ = paddle.get_position()
+        cx, _ = self.center()
+        half = (px2 - px1) / 2
+        rel = max(-1.0, min(1.0, (cx - (px1 + px2) / 2) / half))
+        self.set_angle(math.radians(rel * 60))
+
+    def bounce_brick(self, brick):
+        # Pantulkan sesuai sisi yang tertabrak (horizontal / vertikal)
+        x1, y1, x2, y2 = self.get_position()
+        bx1, by1, bx2, by2 = brick.get_position()
+        overlap_x = min(x2, bx2) - max(x1, bx1)
+        overlap_y = min(y2, by2) - max(y1, by1)
+        if overlap_x < overlap_y:
+            self.dx = -self.dx
+        else:
+            self.dy = -self.dy
+
+
