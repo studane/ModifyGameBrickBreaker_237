@@ -24,3 +24,18 @@ ADS = ['Ultra Paddle Pack - $4.99',
        'Season Pass - $9.99/mo',
        'Double Score Boost - $2.99']
 
+
+class GameObject:
+    def __init__(self, canvas, item):
+        self.canvas = canvas
+        self.item = item
+
+    def get_position(self):
+        return self.canvas.coords(self.item)
+
+    def move(self, x, y):
+        self.canvas.move(self.item, x, y)
+
+    def delete(self):
+        self.canvas.delete(self.item)
+
